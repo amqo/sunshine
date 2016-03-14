@@ -172,7 +172,9 @@ public class ForecastFragment extends Fragment implements Callback<SunshineDay> 
 
     @Override
     public void onResponse(Call<SunshineDay> call, Response<SunshineDay> response) {
-        getActivity().setProgressBarIndeterminateVisibility(false);
+        if (getActivity() != null) {
+            getActivity().setProgressBarIndeterminateVisibility(false);
+        }
 
         SunshineDay sunshineDay = response.body();
 
