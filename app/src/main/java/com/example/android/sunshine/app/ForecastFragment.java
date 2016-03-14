@@ -15,7 +15,9 @@
  */
 package com.example.android.sunshine.app;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.format.Time;
 import android.view.LayoutInflater;
@@ -24,6 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -95,6 +98,12 @@ public class ForecastFragment extends Fragment implements Callback<SunshineDay> 
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        reloadListWithRetrofit();
+    }
+
     private void reloadListWithRetrofit() {
 
         final String FORMAT_PARAM = "mode";
@@ -136,8 +145,19 @@ public class ForecastFragment extends Fragment implements Callback<SunshineDay> 
 
         SunshineEndpointInterface sunshineAPI = retrofit.create(
                 SunshineEndpointInterface.class);
-        Call<SunshineDay>  call = sunshineAPI.getDays(VERSION, "08026");
+
+        String locationValue = getLocationValueFromPreferences();
+
+        Call<SunshineDay>  call = sunshineAPI.getDays(VERSION, locationValue);
         call.enqueue(this);
+    }
+
+    private String getLocationValueFromPreferences() {
+        String locationKey = getString(R.string.pref_location_key);
+        String locationDefaultValue = getString(R.string.pref_location_default);
+        return PreferenceManager
+                .getDefaultSharedPreferences(getActivity())
+                .getString(locationKey, locationDefaultValue);
     }
 
     @Override
@@ -212,6 +232,16 @@ public class ForecastFragment extends Fragment implements Callback<SunshineDay> 
 
         ButterKnife.bind(this, rootView);
         mListView.setAdapter(mForecastAdapter);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String forecast = mForecastAdapter.getItem(position);
+//                Snackbar.make(view, forecast, Snackbar.LENGTH_LONG).show();
+                Intent intent = new Intent(getActivity(), DetailActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT, forecast);
+                startActivity(intent);
+            }
+        });
 
         return rootView;
     }
