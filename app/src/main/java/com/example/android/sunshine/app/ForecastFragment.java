@@ -271,6 +271,7 @@ public class ForecastFragment extends Fragment implements Callback<SunshineDay> 
     /**
      * Prepare the weather high/lows for presentation.
      */
+    //@DebugLog
     private String formatHighLows(double high, double low, String unitType) {
         if (unitType.equals(getString(R.string.pref_units_imperial))) {
             high = (high * 1.8) + 32;

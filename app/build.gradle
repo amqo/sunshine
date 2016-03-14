@@ -1,4 +1,17 @@
+
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.jakewharton.hugo:hugo-plugin:1.2.1'
+    }
+}
+
 apply plugin: 'com.android.application'
+apply plugin: 'com.jakewharton.hugo'
 
 android {
     compileSdkVersion 23
@@ -19,6 +32,7 @@ android {
 
     buildTypes.each {
         it.buildConfigField 'String', 'OPEN_WEATHER_MAP_API_KEY', '"f3372a01184a640f574219c51aa346e1"'
+        it.buildConfigField 'boolean', 'HUGO_STATE', 'false'
     }
 
     productFlavors {
@@ -34,4 +48,7 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.1.2'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.android.support:design:23.+'
+
+    compile 'frankiesardo:icepick:3.2.0'
+    provided 'frankiesardo:icepick-processor:3.2.0'
 }
