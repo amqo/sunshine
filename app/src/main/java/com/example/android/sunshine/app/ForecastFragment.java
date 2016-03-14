@@ -16,10 +16,12 @@
 package com.example.android.sunshine.app;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.format.Time;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -122,7 +124,7 @@ public class ForecastFragment extends Fragment implements Callback<SunshineDay> 
 
                 urlBuilder = urlBuilder.addQueryParameter(FORMAT_PARAM, "json")
                     .addQueryParameter(UNITS_PARAM, "metric")
-                    .addQueryParameter(APPID_PARAM, "f3372a01184a640f574219c51aa346e1")
+                    .addQueryParameter(APPID_PARAM, BuildConfig.OPEN_WEATHER_MAP_API_KEY)
                     .addQueryParameter(DAYS_PARAM, Integer.toString(NUM_DAYS));
 
                 HttpUrl url = urlBuilder.build();
@@ -160,9 +162,18 @@ public class ForecastFragment extends Fragment implements Callback<SunshineDay> 
                 .getString(locationKey, locationDefaultValue);
     }
 
+    private String getUnitTypeFromPreferences() {
+        SharedPreferences sharedPrefs =
+                PreferenceManager.getDefaultSharedPreferences(getActivity());
+        return sharedPrefs.getString(
+                getString(R.string.pref_units_key),
+                getString(R.string.pref_units_metric));
+    }
+
     @Override
     public void onResponse(Call<SunshineDay> call, Response<SunshineDay> response) {
         getActivity().setProgressBarIndeterminateVisibility(false);
+
         SunshineDay sunshineDay = response.body();
 
         String day = "";
@@ -176,10 +187,12 @@ public class ForecastFragment extends Fragment implements Callback<SunshineDay> 
         int julianStartDay = Time.getJulianDay(System.currentTimeMillis(), dayTime.gmtoff);
         dayTime = new Time();
 
+        String unitType = getUnitTypeFromPreferences();
+
         int i = 0;
         for (SunshineInfo sunshineInfo : sunshineDay.getList()) {
             SunshineTemperature temperature = sunshineInfo.getTemperature();
-            highAndLow = formatHighLows(temperature.getMax(), temperature.getMin());
+            highAndLow = formatHighLows(temperature.getMax(), temperature.getMin(), unitType);
             SunshineWeather weather = sunshineInfo.getWeather();
             if (weather != null) {
                 description = weather.getDescription();
@@ -256,7 +269,14 @@ public class ForecastFragment extends Fragment implements Callback<SunshineDay> 
     /**
      * Prepare the weather high/lows for presentation.
      */
-    private String formatHighLows(double high, double low) {
+    private String formatHighLows(double high, double low, String unitType) {
+        if (unitType.equals(getString(R.string.pref_units_imperial))) {
+            high = (high * 1.8) + 32;
+            low = (low * 1.8) + 32;
+        } else if (!unitType.equals(getString(R.string.pref_units_metric))) {
+            Log.d(LOG_TAG, "Unit type not found: " + unitType);
+        }
+
         // For presentation, assume the user doesn't care about tenths of a degree.
         long roundedHigh = Math.round(high);
         long roundedLow = Math.round(low);
