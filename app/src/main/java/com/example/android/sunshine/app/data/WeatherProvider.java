@@ -83,7 +83,7 @@ public class WeatherProvider extends ContentProvider {
             selection = sLocationSettingWithStartDateSelection;
         }
 
-        return sWeatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+        Cursor cursor =  sWeatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 selection,
                 selectionArgs,
@@ -91,6 +91,8 @@ public class WeatherProvider extends ContentProvider {
                 null,
                 sortOrder
         );
+
+        return cursor;
     }
 
     private Cursor getWeatherByLocationSettingAndDate(

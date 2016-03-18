@@ -10,8 +10,15 @@ import java.util.List;
  */
 public class SunshineDay {
 
+    @SerializedName("city")
+    SunshineCity mCity;
+
     @SerializedName("list")
     List<SunshineInfo> mList = new ArrayList<>();
+
+    public SunshineCity getCity() {
+        return mCity;
+    }
 
     public List<SunshineInfo> getList() {
         return mList;

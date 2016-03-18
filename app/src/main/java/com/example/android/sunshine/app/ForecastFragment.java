@@ -16,12 +16,8 @@
 package com.example.android.sunshine.app;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.text.format.Time;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,39 +27,23 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import com.example.android.sunshine.app.model.SunshineDay;
-import com.example.android.sunshine.app.model.SunshineInfo;
-import com.example.android.sunshine.app.model.SunshineTemperature;
-import com.example.android.sunshine.app.model.SunshineWeather;
-
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import okhttp3.HttpUrl;
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Encapsulates fetching the forecast and displaying it as a {@link ListView} layout.
  */
-public class ForecastFragment extends Fragment implements Callback<SunshineDay> {
+public class ForecastFragment extends Fragment {
 
     private final String LOG_TAG = ForecastFragment.class.getSimpleName();
 
     private ArrayAdapter<String> mForecastAdapter;
+    private FetchWeatherTask mFetchWeatherTask;
 
     @Bind(R.id.listview_forecast)ListView mListView;
 
@@ -108,113 +88,8 @@ public class ForecastFragment extends Fragment implements Callback<SunshineDay> 
 
     private void reloadListWithRetrofit() {
 
-        final String FORMAT_PARAM = "mode";
-        final String UNITS_PARAM = "units";
-        final String DAYS_PARAM = "cnt";
-        final String APPID_PARAM = "APPID";
+        mFetchWeatherTask.reload();
 
-        final int NUM_DAYS = 7;
-        final double VERSION = 2.5;
-
-        Interceptor interceptor = new Interceptor() {
-            @Override
-            public okhttp3.Response intercept(Chain chain) throws IOException {
-                Request request = chain.request();
-                HttpUrl.Builder urlBuilder = request.url().newBuilder();
-
-                urlBuilder = urlBuilder.addQueryParameter(FORMAT_PARAM, "json")
-                    .addQueryParameter(UNITS_PARAM, "metric")
-                    .addQueryParameter(APPID_PARAM, BuildConfig.OPEN_WEATHER_MAP_API_KEY)
-                    .addQueryParameter(DAYS_PARAM, Integer.toString(NUM_DAYS));
-
-                HttpUrl url = urlBuilder.build();
-
-                request = request.newBuilder().url(url).build();
-                return chain.proceed(request);
-            }
-        };
-
-        OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
-        clientBuilder.interceptors().add(interceptor);
-        OkHttpClient client = clientBuilder.build();
-
-        String baseUrl = "http://api.openweathermap.org/";
-        Retrofit retrofit = new Retrofit.Builder()
-                .client(client)
-                .baseUrl(baseUrl)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        SunshineEndpointInterface sunshineAPI = retrofit.create(
-                SunshineEndpointInterface.class);
-
-        String locationValue = getLocationValueFromPreferences();
-
-        Call<SunshineDay>  call = sunshineAPI.getDays(VERSION, locationValue);
-        call.enqueue(this);
-    }
-
-    private String getLocationValueFromPreferences() {
-        String locationKey = getString(R.string.pref_location_key);
-        String locationDefaultValue = getString(R.string.pref_location_default);
-        return PreferenceManager
-                .getDefaultSharedPreferences(getActivity())
-                .getString(locationKey, locationDefaultValue);
-    }
-
-    private String getUnitTypeFromPreferences() {
-        SharedPreferences sharedPrefs =
-                PreferenceManager.getDefaultSharedPreferences(getActivity());
-        return sharedPrefs.getString(
-                getString(R.string.pref_units_key),
-                getString(R.string.pref_units_metric));
-    }
-
-    @Override
-    public void onResponse(Call<SunshineDay> call, Response<SunshineDay> response) {
-        if (getActivity() != null) {
-            getActivity().setProgressBarIndeterminateVisibility(false);
-        }
-
-        SunshineDay sunshineDay = response.body();
-
-        String day = "";
-        String description = "";
-        String highAndLow;
-
-        String[] resultStrs = new String[sunshineDay.getList().size()];
-
-        Time dayTime = new Time();
-        dayTime.setToNow();
-        int julianStartDay = Time.getJulianDay(System.currentTimeMillis(), dayTime.gmtoff);
-        dayTime = new Time();
-
-        String unitType = getUnitTypeFromPreferences();
-
-        int i = 0;
-        for (SunshineInfo sunshineInfo : sunshineDay.getList()) {
-            SunshineTemperature temperature = sunshineInfo.getTemperature();
-            highAndLow = formatHighLows(temperature.getMax(), temperature.getMin(), unitType);
-            SunshineWeather weather = sunshineInfo.getWeather();
-            if (weather != null) {
-                description = weather.getDescription();
-                long dateTime;
-                dateTime = dayTime.setJulianDay(julianStartDay+i);
-                day = getReadableDateString(dateTime);
-            }
-            resultStrs[i++] = day + " - " + description + " - " + highAndLow;
-        }
-
-        if (resultStrs != null) {
-            mForecastAdapter.clear();
-            mForecastAdapter.addAll(resultStrs);
-        }
-
-    }
-
-    @Override
-    public void onFailure(Call<SunshineDay> call, Throwable t) {
-        Toast.makeText(getActivity(), t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -243,6 +118,8 @@ public class ForecastFragment extends Fragment implements Callback<SunshineDay> 
                         R.id.list_item_forecast_textview, // The ID of the textview to populate.
                         weekForecast);
 
+        mFetchWeatherTask = new FetchWeatherTask(getActivity(), mForecastAdapter);
+
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         ButterKnife.bind(this, rootView);
@@ -251,7 +128,6 @@ public class ForecastFragment extends Fragment implements Callback<SunshineDay> 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String forecast = mForecastAdapter.getItem(position);
-//                Snackbar.make(view, forecast, Snackbar.LENGTH_LONG).show();
                 Intent intent = new Intent(getActivity(), DetailActivity.class)
                         .putExtra(Intent.EXTRA_TEXT, forecast);
                 startActivity(intent);
@@ -259,32 +135,5 @@ public class ForecastFragment extends Fragment implements Callback<SunshineDay> 
         });
 
         return rootView;
-    }
-
-    private String getReadableDateString(long time){
-        // Because the API returns a unix timestamp (measured in seconds),
-        // it must be converted to milliseconds in order to be converted to valid date.
-        SimpleDateFormat shortenedDateFormat = new SimpleDateFormat("EEE MMM dd");
-        return shortenedDateFormat.format(time);
-    }
-
-    /**
-     * Prepare the weather high/lows for presentation.
-     */
-    //@DebugLog
-    private String formatHighLows(double high, double low, String unitType) {
-        if (unitType.equals(getString(R.string.pref_units_imperial))) {
-            high = (high * 1.8) + 32;
-            low = (low * 1.8) + 32;
-        } else if (!unitType.equals(getString(R.string.pref_units_metric))) {
-            Log.d(LOG_TAG, "Unit type not found: " + unitType);
-        }
-
-        // For presentation, assume the user doesn't care about tenths of a degree.
-        long roundedHigh = Math.round(high);
-        long roundedLow = Math.round(low);
-
-        String highLowStr = roundedHigh + "/" + roundedLow;
-        return highLowStr;
     }
 }
