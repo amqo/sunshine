@@ -23,7 +23,7 @@ import butterknife.ButterKnife;
  */
 public class DetailActivityFragment extends Fragment {
 
-    private static final String LOG_TAG = DetailActivityFragment.class.getSimpleName();
+//    private static final String LOG_TAG = DetailActivityFragment.class.getSimpleName();
     private static final String FORECAST_SHARE_HASHTAG = "#SunshineApp";
 
     private String mForecastStr;

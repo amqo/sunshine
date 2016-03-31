@@ -40,7 +40,7 @@ import butterknife.ButterKnife;
  */
 public class ForecastFragment extends Fragment {
 
-    private final String LOG_TAG = ForecastFragment.class.getSimpleName();
+//    private final String LOG_TAG = ForecastFragment.class.getSimpleName();
 
     private ArrayAdapter<String> mForecastAdapter;
     private FetchWeatherTask mFetchWeatherTask;
@@ -69,12 +69,7 @@ public class ForecastFragment extends Fragment {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-
-            //FetchWeatherTask weatherTask = new FetchWeatherTask();
-            //weatherTask.execute("08026");
-
             reloadListWithRetrofit();
-
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -87,9 +82,7 @@ public class ForecastFragment extends Fragment {
     }
 
     private void reloadListWithRetrofit() {
-
         mFetchWeatherTask.reload();
-
     }
 
     @Override

@@ -209,7 +209,7 @@ public class FetchWeatherTask implements Callback<SunshineDay> {
 
         String locationValue = getLocationValueFromPreferences();
 
-        Call<SunshineDay>  call = sunshineAPI.getDays(VERSION, locationValue);
+        Call<SunshineDay> call = sunshineAPI.getDays(VERSION, locationValue);
         call.enqueue(this);
     }
 
@@ -262,14 +262,10 @@ public class FetchWeatherTask implements Callback<SunshineDay> {
                 weatherValues.put(WeatherEntry.COLUMN_SHORT_DESC, description);
                 weatherValues.put(WeatherEntry.COLUMN_WEATHER_ID, weather.getId());
 
-                WeatherDbHelper helper = new WeatherDbHelper(mContext);
-                SQLiteDatabase db = helper.getWritableDatabase();
-                try {
-                    long insertedId = db.insert( WeatherContract.WeatherEntry.TABLE_NAME, null, weatherValues);
-                    Log.d(LOG_TAG, "Insert Complete. " + insertedId + " Inserted");
-                } finally {
-                    db.close();
-                }
+                Uri insertedUri = mContext.getContentResolver().insert(
+                        WeatherEntry.CONTENT_URI, weatherValues);
+                        //db.insert( WeatherContract.WeatherEntry.TABLE_NAME, null, weatherValues);
+                Log.d(LOG_TAG, "Insert Complete. " + insertedUri.toString() + " Inserted");
 
                 cVVector.add(weatherValues);
             }
