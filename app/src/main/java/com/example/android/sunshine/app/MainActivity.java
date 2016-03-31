@@ -20,6 +20,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -27,14 +28,31 @@ import android.view.MenuItem;
 
 public class MainActivity extends ActionBarActivity {
 
+    String mLocation;
+
+    private static final String FORECAST_FRAGMENT_TAG = "FORECAST_FRAGMENT_TAG";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mLocation = getStoredLocation();
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new ForecastFragment())
+                    .add(R.id.container, new ForecastFragment(), FORECAST_FRAGMENT_TAG)
                     .commit();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String currentStoredLocation = getStoredLocation();
+        if (!currentStoredLocation.equals(mLocation)) {
+            ForecastFragment forecastFragment = (ForecastFragment) getSupportFragmentManager()
+                    .findFragmentByTag(FORECAST_FRAGMENT_TAG);
+            forecastFragment.onLocationChanged();
+            mLocation = currentStoredLocation;
         }
     }
 
@@ -66,11 +84,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void openPreferredLocationInMap() {
-        SharedPreferences sharedPrefs =
-                PreferenceManager.getDefaultSharedPreferences(this);
-        String location = sharedPrefs.getString(
-                getString(R.string.pref_location_key),
-                getString(R.string.pref_location_default));
+        String location = getStoredLocation();
 
         Uri geoLocation = Uri.parse("geo:0:0?").buildUpon()
                 .appendQueryParameter("q", location).build();
@@ -83,5 +97,14 @@ public class MainActivity extends ActionBarActivity {
             Snackbar.make(getCurrentFocus(), "Couldn't call " +
                     location + ", no map apps installed!", Snackbar.LENGTH_SHORT).show();
         }
+    }
+
+    @NonNull
+    private String getStoredLocation() {
+        SharedPreferences sharedPrefs =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        return sharedPrefs.getString(
+                getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default));
     }
 }
