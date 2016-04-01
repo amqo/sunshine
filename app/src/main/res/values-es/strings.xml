@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Sunshine</string>
+    <string name="today">Hoy</string>
+    <string name="tomorrow">Mañana</string>
+    <string name="action_settings">Configuración</string>
+    <string name="action_map">Mapa</string>
+    <string name="action_refresh" translatable="false">Recargar</string>
+    <string name="action_share">Compartir</string>
+    <string name="pref_location_label">Localización</string>
+    <string name="pref_units_label">Unidades Temperatura</string>
+    <string name="pref_units_label_imperial"></string>
+    <string name="pref_units_label_metric">Métrico</string>
+    <string name="title_activity_detail">Detalle</string>
+    <string name="title_activity_settings">Configuración</string>
+</resources>

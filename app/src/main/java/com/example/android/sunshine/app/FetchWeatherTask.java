@@ -41,6 +41,7 @@ import com.example.android.sunshine.app.model.SunshineWeather;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Vector;
 
 import okhttp3.HttpUrl;
@@ -110,6 +111,7 @@ public class FetchWeatherTask implements Callback<SunshineDay> {
         final String FORMAT_PARAM = "mode";
         final String UNITS_PARAM = "units";
         final String DAYS_PARAM = "cnt";
+        final String LANG_PARAM = "lang";
         final String APPID_PARAM = "APPID";
 
         final int NUM_DAYS = 7;
@@ -124,6 +126,7 @@ public class FetchWeatherTask implements Callback<SunshineDay> {
                 urlBuilder = urlBuilder.addQueryParameter(FORMAT_PARAM, "json")
                         .addQueryParameter(UNITS_PARAM, "metric")
                         .addQueryParameter(APPID_PARAM, BuildConfig.OPEN_WEATHER_MAP_API_KEY)
+                        .addQueryParameter(LANG_PARAM, Locale.getDefault().getLanguage())
                         .addQueryParameter(DAYS_PARAM, Integer.toString(NUM_DAYS));
 
                 HttpUrl url = urlBuilder.build();

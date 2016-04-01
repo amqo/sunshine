@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2" >
 
     <!--
          Used in Action Bar, and in AndroidManifest to tell the device the name of this app.
@@ -17,7 +17,7 @@
     <string name="action_share">Share</string>
 
     <!-- Menu label to fetch updated weather info from the server -->
-    <string name="action_refresh" translatable="false">Refresh</string>
+    <string name="action_refresh">Refresh</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_detail">Detail</string>
     <string name="title_activity_settings">Settings</string>
@@ -48,5 +48,14 @@
 
     <!-- Value in SharedPreferences for imperial temperature unit option [CHAR LIMIT=NONE] -->
     <string name="pref_units_imperial" translatable="false">imperial</string>
+
+    <!-- Date label when displaying today's weather forecast [CHAR LIMIT=20] -->
+    <string name="today">Today</string>
+
+    <!-- Date label when displaying tomorrow's weather forecast [CHAR LIMIT=20] -->
+    <string name="tomorrow">Tomorrow</string>
+
+    <!-- Date format for displaying day of week and date (i.e. Mon Jun 1) [CHAR LIMIT=20] -->
+    <string name="format_full_friendly_date"><xliff:g id="day">%1$s</xliff:g>, <xliff:g id="date">%2$s</xliff:g></string>
 
 </resources>
