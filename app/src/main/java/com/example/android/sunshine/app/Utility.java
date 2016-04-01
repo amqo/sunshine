@@ -38,16 +38,6 @@ public class Utility {
                 .equals(context.getString(R.string.pref_units_metric));
     }
 
-    static String formatTemperature(double temperature, boolean isMetric) {
-        double temp;
-        if ( !isMetric ) {
-            temp = 9 * temperature / 5 + 32;
-        } else {
-            temp = temperature;
-        }
-        return String.format("%.0f", temp);
-    }
-
     static String formatDate(long dateInMillis) {
         Date date = new Date(dateInMillis);
         return DateFormat.getDateInstance().format(date);
@@ -140,5 +130,15 @@ public class Utility {
         SimpleDateFormat monthDayFormat = new SimpleDateFormat("MMMM dd");
         String monthDayString = monthDayFormat.format(dateInMillis);
         return monthDayString;
+    }
+
+    static String formatTemperature(Context context, double temperature, boolean isMetric) {
+        double temp;
+        if ( !isMetric ) {
+            temp = 9 * temperature / 5 + 32;
+        } else {
+            temp = temperature;
+        }
+        return context.getString(R.string.format_temperature, temp);
     }
 }
