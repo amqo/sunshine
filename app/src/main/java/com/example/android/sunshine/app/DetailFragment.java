@@ -24,6 +24,8 @@ import android.widget.TextView;
 import com.example.android.sunshine.app.data.WeatherContract;
 import com.example.android.sunshine.app.data.WeatherContract.WeatherEntry;
 
+import org.w3c.dom.Text;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -132,7 +134,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         Intent intent = getActivity().getIntent();
 
-        if (intent != null) {
+        if (intent != null && !TextUtils.isEmpty(intent.getDataString())) {
             Uri forecastUri = Uri.parse(intent.getDataString());
             String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
             return new CursorLoader(getActivity(), forecastUri,
@@ -173,8 +175,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         if (data != null && data.moveToFirst()) {
             // Read weather condition ID from cursor
             int weatherId = data.getInt(COL_WEATHER_CONDITION_ID);
+            int weatherIcon = Utility.getArtResourceForWeatherCondition(weatherId);
+
             // Use placeholder Image
-            mIconView.setImageResource(R.drawable.ic_launcher);
+            mIconView.setImageResource(weatherIcon);
 
             // Read date from cursor and update views for day of week and date
             long date = data.getLong(COL_WEATHER_DATE);
