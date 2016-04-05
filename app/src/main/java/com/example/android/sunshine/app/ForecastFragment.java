@@ -16,7 +16,6 @@
 package com.example.android.sunshine.app;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,7 +24,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.telecom.Call;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,6 +37,8 @@ import com.example.android.sunshine.app.data.WeatherContract;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import icepick.Icepick;
+import icepick.State;
 
 /**
  * Encapsulates fetching the forecast and displaying it as a {@link ListView} layout.
@@ -54,7 +54,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        public void onItemSelected(Uri dateUri);
+        void onItemSelected(Uri dateUri);
     }
 
     private Callback mItemSelectedCallback;
@@ -90,6 +90,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Bind(R.id.listview_forecast)ListView mListView;
 
+    @State int mCurrentPosition = 0;
+
     public ForecastFragment() {
     }
 
@@ -98,6 +100,13 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         super.onCreate(savedInstanceState);
         // Add this line in order for this fragment to handle menu events.
         setHasOptionsMenu(true);
+        Icepick.restoreInstanceState(this, savedInstanceState);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Icepick.saveInstanceState(this, outState);
     }
 
     @Override
@@ -158,9 +167,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                         mItemSelectedCallback.onItemSelected(intentData);
                     }
                 }
+                mCurrentPosition = position;
             }
         });
-
         return rootView;
     }
 
@@ -179,6 +188,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         mForecastAdapter.swapCursor(cursor);
+        mListView.setSelection(mCurrentPosition);
     }
 
     @Override
