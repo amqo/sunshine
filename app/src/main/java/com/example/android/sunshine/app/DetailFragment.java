@@ -63,8 +63,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public static final int COL_WEATHER_DEGREES = 8;
     public static final int COL_WEATHER_CONDITION_ID = 9;
 
-//    @Bind(R.id.listview_forecast)ListView mListView;
-
     @Bind(R.id.detail_icon)ImageView mIconView;
     @Bind(R.id.detail_day_textview)TextView mFriendlyDateView;
     @Bind(R.id.detail_date_textview)TextView mDateView;
@@ -116,7 +114,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.clear();
         inflater.inflate(R.menu.menu_detail, menu);
 
         MenuItem item = menu.findItem(R.id.action_share);
