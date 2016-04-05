@@ -91,6 +91,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Bind(R.id.listview_forecast)ListView mListView;
 
     @State int mCurrentPosition = 0;
+    @State boolean mUseTodayLayout;
 
     public ForecastFragment() {
     }
@@ -146,6 +147,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                              Bundle savedInstanceState) {
 
         mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
+        mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
 
         mFetchWeatherTask = new FetchWeatherTask(getActivity());
 
@@ -199,5 +201,12 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public void onLocationChanged() {
         mFetchWeatherTask.reload();
         getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
+    }
+
+    public void setUseTodayLayout(boolean useTodayLayout) {
+        mUseTodayLayout = useTodayLayout;
+        if (mForecastAdapter != null) {
+            mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
+        }
     }
 }
