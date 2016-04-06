@@ -69,10 +69,6 @@ public class ForecastAdapter extends CursorAdapter {
 
         ViewHolder holder = (ViewHolder) view.getTag();
 
-        int weatherIcon = getWeatherIcon(cursor);
-
-        holder.iconView.setImageResource(weatherIcon);
-
         boolean isMetric = Utility.isMetric(context);
 
         double highTemp = cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP);
@@ -83,7 +79,13 @@ public class ForecastAdapter extends CursorAdapter {
 
         holder.dateView.setText(Utility.getFriendlyDayString(
                 context, cursor.getLong(ForecastFragment.COL_WEATHER_DATE)));
-        holder.forecastView.setText(cursor.getString(ForecastFragment.COL_WEATHER_DESC));
+
+        String description = cursor.getString(ForecastFragment.COL_WEATHER_DESC);
+        holder.forecastView.setText(description);
+
+        int weatherIcon = getWeatherIcon(cursor);
+        holder.iconView.setImageResource(weatherIcon);
+        holder.iconView.setContentDescription(description);
     }
 
     private int getWeatherIcon(Cursor cursor) {
