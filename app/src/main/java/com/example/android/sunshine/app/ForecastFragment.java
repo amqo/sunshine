@@ -15,14 +15,10 @@
  */
 package com.example.android.sunshine.app;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -38,6 +34,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.android.sunshine.app.data.WeatherContract;
+import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -139,7 +136,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            fetchWeatherData();
+            updateWeather();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -200,7 +197,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     public void onLocationChanged() {
-        fetchWeatherData();
+        updateWeather();
         getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
     }
 
@@ -211,15 +208,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         }
     }
 
-    private void fetchWeatherData() {
-//      getActivity().startService(new Intent(getActivity(), SunshineService.class));
-
-        Intent alarmIntent = new Intent(getActivity(), SunshineService.AlarmReceiver.class);
-        PendingIntent alarmPendingIntent = PendingIntent.getBroadcast(
-                getActivity(), 0, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
-
-        AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
-        alarmManager.set(AlarmManager.RTC_WAKEUP,
-                System.currentTimeMillis() + 5 * 1000, alarmPendingIntent);
+    private void updateWeather() {
+        SunshineSyncAdapter.syncImmediately(getActivity());
     }
 }
