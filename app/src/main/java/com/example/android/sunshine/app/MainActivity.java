@@ -22,6 +22,9 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.ndk.CrashlyticsNdk;
+import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends ActionBarActivity implements ForecastFragment.Callback {
 
@@ -34,6 +37,7 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics(), new CrashlyticsNdk());
         mLocation = Utility.getPreferredLocation(this);
 
         setContentView(R.layout.activity_main);

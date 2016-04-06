@@ -40,6 +40,9 @@
             android:authorities="com.example.android.sunshine.app"
             android:name=".data.WeatherProvider" />
         
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="00e494c939b2e0b329c98207c23972d3e5893f7d" />
     </application>
 
 </manifest>
