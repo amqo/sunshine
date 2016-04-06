@@ -15,10 +15,14 @@
  */
 package com.example.android.sunshine.app;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -86,7 +90,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 //    private final String LOG_TAG = ForecastFragment.class.getSimpleName();
 
     private ForecastAdapter mForecastAdapter;
-    private FetchWeatherTask mFetchWeatherTask;
 
     @Bind(R.id.listview_forecast)ListView mListView;
 
@@ -136,7 +139,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            mFetchWeatherTask.reload();
+            fetchWeatherData();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -148,8 +151,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
         mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
         mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
-
-        mFetchWeatherTask = new FetchWeatherTask(getActivity());
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
@@ -199,7 +200,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     public void onLocationChanged() {
-        mFetchWeatherTask.reload();
+        fetchWeatherData();
         getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
     }
 
@@ -208,5 +209,17 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         if (mForecastAdapter != null) {
             mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
         }
+    }
+
+    private void fetchWeatherData() {
+//      getActivity().startService(new Intent(getActivity(), SunshineService.class));
+
+        Intent alarmIntent = new Intent(getActivity(), SunshineService.AlarmReceiver.class);
+        PendingIntent alarmPendingIntent = PendingIntent.getBroadcast(
+                getActivity(), 0, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
+
+        AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+        alarmManager.set(AlarmManager.RTC_WAKEUP,
+                System.currentTimeMillis() + 5 * 1000, alarmPendingIntent);
     }
 }
