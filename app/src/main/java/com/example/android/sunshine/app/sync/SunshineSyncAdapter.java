@@ -38,6 +38,7 @@ import com.example.android.sunshine.app.model.SunshineTemperature;
 import com.example.android.sunshine.app.model.SunshineWeather;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Locale;
 import java.util.Vector;
 
@@ -300,12 +301,15 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
             int inserts = getContext().getContentResolver().bulkInsert(
                     WeatherContract.WeatherEntry.CONTENT_URI,
                     contentValues);
+
             Log.d(LOG_TAG, "BuilkInsert Complete. " + inserts + " Inserted");
 
-            boolean isAllowingNotifications = Utility.isAllowingNotifications(getContext());
-            if (isAllowingNotifications) {
-                notifyWeather();
-            }
+            long dateTimeYesterday = dayTime.setJulianDay(julianStartDay - 1);
+            getContext().getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI,
+                    WeatherContract.WeatherEntry.COLUMN_DATE + " <= ?",
+                    new String[] {Long.toString(dateTimeYesterday)});
+
+            notifyWeather();
         }
     }
 
@@ -316,7 +320,9 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
         String lastNotificationKey = context.getString(R.string.pref_last_notification);
         long lastSync = prefs.getLong(lastNotificationKey, 0);
 
-        if (System.currentTimeMillis() - lastSync >= DAY_IN_MILLIS) {
+        boolean isAllowingNotifications = Utility.isAllowingNotifications(getContext());
+        if (isAllowingNotifications && System.currentTimeMillis() - lastSync >= DAY_IN_MILLIS) {
+
             // Last sync was more than 1 day ago, let's send a notification with the weather.
             String locationQuery = Utility.getPreferredLocation(context);
 
