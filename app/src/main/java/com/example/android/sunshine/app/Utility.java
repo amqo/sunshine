@@ -31,16 +31,16 @@ public class Utility {
                 context.getString(R.string.pref_location_default));
     }
 
-    public static boolean isMetric(Context context) {
+    private static boolean isMetric(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getString(context.getString(R.string.pref_units_key),
                 context.getString(R.string.pref_units_metric))
                 .equals(context.getString(R.string.pref_units_metric));
     }
 
-    static String formatDate(long dateInMillis) {
-        Date date = new Date(dateInMillis);
-        return DateFormat.getDateInstance().format(date);
+    public static boolean isAllowingNotifications(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getBoolean(context.getString(R.string.pref_enable_notifications_key), true);
     }
 
     // Format used for storing dates in the database.  ALso used for converting those strings
@@ -133,8 +133,9 @@ public class Utility {
         return monthDayString;
     }
 
-    static String formatTemperature(Context context, double temperature, boolean isMetric) {
+    public static String formatTemperature(Context context, double temperature) {
         double temp;
+        boolean isMetric = Utility.isMetric(context);
         if (!isMetric) {
             temp = 9 * temperature / 5 + 32;
         } else {

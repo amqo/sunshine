@@ -17,4 +17,8 @@
     <string name="format_pressure">Presión: <xliff:g id="pressure">%1.0f</xliff:g> hPa</string>
     <string name="format_wind_kmh">Viento: <xliff:g id="speed">%1$1.0f</xliff:g> km/h <xliff:g id="direction">%2$s</xliff:g></string>
     <string name="format_wind_mph">Viento: <xliff:g id="speed">%1$1.0f</xliff:g> mph <xliff:g id="direction">%2$s</xliff:g></string>
+    <string name="format_notification">Previsión: <xliff:g id="condition">%1$s</xliff:g> Alta: <xliff:g id="high">%2$s</xliff:g> Baja: <xliff:g id="low">%3$s</xliff:g></string>
+    <string name="pref_enable_notifications_false">No Habilitadas</string>
+    <string name="pref_enable_notifications_label">Notificaciones de Previsión</string>
+    <string name="pref_enable_notifications_true">Habilitadas</string>
 </resources>

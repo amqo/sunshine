@@ -4,6 +4,8 @@ import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -43,11 +45,16 @@ public class SettingsActivity extends PreferenceActivity
         // Set the listener to watch for value changes.
         preference.setOnPreferenceChangeListener(this);
 
-        // Trigger the listener immediately with the preference's
-        // current value.
-        onPreferenceChange(preference, PreferenceManager
-                        .getDefaultSharedPreferences(preference.getContext())
-                        .getString(preference.getKey(), ""));
+        if (preference instanceof CheckBoxPreference) {
+            onPreferenceChange(preference, PreferenceManager
+                    .getDefaultSharedPreferences(preference.getContext())
+                    .getBoolean(preference.getKey(), true));
+        } else {
+            onPreferenceChange(preference, PreferenceManager
+                    .getDefaultSharedPreferences(preference.getContext())
+                    .getString(preference.getKey(), ""));
+        }
+
     }
 
     @Override
@@ -62,8 +69,7 @@ public class SettingsActivity extends PreferenceActivity
             if (prefIndex >= 0) {
                 preference.setSummary(listPreference.getEntries()[prefIndex]);
             }
-        } else {
-            // For other preferences, set the summary to the value's simple string representation.
+        } else if(preference instanceof EditTextPreference) {
             preference.setSummary(stringValue);
         }
         SunshineSyncAdapter.syncImmediately(this);
