@@ -38,7 +38,6 @@ import com.example.android.sunshine.app.model.SunshineTemperature;
 import com.example.android.sunshine.app.model.SunshineWeather;
 
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.Locale;
 import java.util.Vector;
 
@@ -261,6 +260,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
         dayTime = new Time();
 
         SunshineCity city = sunshineDay.getCity();
+        if (city == null || city.getCityCoords() == null) return;
 
         String locationSetting = getLocationValueFromPreferences();
 

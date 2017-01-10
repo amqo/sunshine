@@ -25,6 +25,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -92,7 +93,10 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     private ForecastAdapter mForecastAdapter;
 
-    @Bind(R.id.listview_forecast)ListView mListView;
+    @Bind(R.id.listview_forecast)
+    ListView mListView;
+    @Bind (R.id.listview_forecast_refresh)
+    SwipeRefreshLayout mListViewRefreshLayout;
 
     @State int mCurrentPosition = 0;
     @State boolean mUseTodayLayout;
@@ -183,6 +187,21 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         ButterKnife.bind(this, rootView);
+
+        initListView();
+        return rootView;
+    }
+
+    private void initListView() {
+
+        mListViewRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                updateWeather();
+                mListViewRefreshLayout.setRefreshing(false);
+            }
+        });
+
         mListView.setAdapter(mForecastAdapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -201,7 +220,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 mCurrentPosition = position;
             }
         });
-        return rootView;
     }
 
     @Override

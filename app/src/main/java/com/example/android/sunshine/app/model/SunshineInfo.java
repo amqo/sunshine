@@ -5,9 +5,6 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by alberto on 11/3/16.
- */
 public class SunshineInfo {
 
     @SerializedName("temp")
